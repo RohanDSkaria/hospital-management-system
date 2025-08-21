@@ -6,6 +6,7 @@ import (
 
 	"github.com/RohanDSkaria/hospital-management-system/api"
 	"github.com/RohanDSkaria/hospital-management-system/internal/database"
+	"github.com/RohanDSkaria/hospital-management-system/internal/model"
 	"github.com/RohanDSkaria/hospital-management-system/internal/repository"
 	"github.com/RohanDSkaria/hospital-management-system/internal/service"
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,19 @@ func main() {
 	database.Connect()
 	db := database.DB
 
+	// --- Repositories ---
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo)
-	authHandler := api.NewAuthHandler(authService)
+	patientRepo := repository.NewPatientRepository(db)
 
+	// --- Services ---
+	authService := service.NewAuthService(userRepo)
+	patientService := service.NewPatientService(patientRepo)
+
+	// --- Handlers ---
+	authHandler := api.NewAuthHandler(authService)
+	patientHandler := api.NewPatientHandler(patientService)
+
+	// --- Router ---
 	router := gin.Default()
 
 	// Public routes group
@@ -35,7 +45,7 @@ func main() {
 
 	// Protected routes group
 	v1Protected := router.Group("/api/v1")
-	v1Protected.Use(api.AuthMiddleware()) // Apply the middleware to this group
+	v1Protected.Use(api.AuthMiddleware())
 	{
 		// This is a sample protected route for testing
 		v1Protected.GET("/profile", func(c *gin.Context) {
@@ -49,6 +59,25 @@ func main() {
 			})
 		})
 
+		// --- Receptionist Routes ---
+		receptionistRoutes := v1Protected.Group("/receptionist")
+		receptionistRoutes.Use(api.RoleAuthMiddleware(model.Receptionist))
+		{
+			receptionistRoutes.POST("/patients", patientHandler.CreatePatient)
+			receptionistRoutes.GET("/patients", patientHandler.GetAllPatients)
+			receptionistRoutes.GET("/patients/:patient_id", patientHandler.GetPatientByID)
+			receptionistRoutes.PUT("/patients/:patient_id", patientHandler.UpdatePatient)
+			receptionistRoutes.DELETE("/patients/:patient_id", patientHandler.DeletePatient)
+		}
+
+		// --- Doctor Routes ---
+		doctorRoutes := v1Protected.Group("/doctor")
+		doctorRoutes.Use(api.RoleAuthMiddleware(model.Doctor))
+		{
+			doctorRoutes.GET("/patients", patientHandler.GetAllPatients)
+			doctorRoutes.GET("/patients/:patient_id", patientHandler.GetPatientByID)
+			doctorRoutes.PUT("/patients/:patient_id", patientHandler.UpdatePatient)
+		}
 	}
 
 	router.GET("/ping", func(c *gin.Context) {

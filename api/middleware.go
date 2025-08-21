@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/RohanDSkaria/hospital-management-system/internal/auth"
+	"github.com/RohanDSkaria/hospital-management-system/internal/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -55,6 +56,27 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("userRole", claims.Role)
 
 		// Continue to the next handler
+		c.Next()
+	}
+}
+
+// RoleAuthMiddleware checks if the user role from the JWT matches the required role
+func RoleAuthMiddleware(requiredRole model.Role) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// We get the userRole from the context, which was set by AuthMiddleware
+		userRole, exists := c.Get("userRole")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "user role not found in token"})
+			return
+		}
+
+		// Check if the user's role is the one we require for this endpoint
+		if userRole.(model.Role) != requiredRole {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "you are not authorized to perform this action"})
+			return
+		}
+
+		// Role is correct, proceed to the handler
 		c.Next()
 	}
 }
