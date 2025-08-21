@@ -25,6 +25,17 @@ type RegisterRequest struct {
 	Role     model.Role `json:"role" binding:"required"`
 }
 
+// @Summary      Register a new user
+// @Description  Creates a new user account (receptionist or doctor).
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        user body RegisterRequest true "User Registration Info"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      409  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Router       /register [post]
 // RegisterHandler handles the user registration endpoint
 func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 	var req RegisterRequest
@@ -71,6 +82,16 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// @Summary      Login user
+// @Description  Authenticates a user and returns a JWT token for access to protected endpoints.
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        user body LoginRequest true "User Login Info"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Router       /login [post]
 // LoginHandler handles the user login endpoint
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	var req LoginRequest

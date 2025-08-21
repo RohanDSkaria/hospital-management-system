@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 
+	"github.com/RohanDSkaria/hospital-management-system/internal/auth"
 	"github.com/RohanDSkaria/hospital-management-system/internal/model"
 	"github.com/RohanDSkaria/hospital-management-system/internal/repository"
-	"github.com/RohanDSkaria/hospital-management-system/internal/auth"
 	"github.com/RohanDSkaria/hospital-management-system/pkg/utils"
 	"gorm.io/gorm"
 )

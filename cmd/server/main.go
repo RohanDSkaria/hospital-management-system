@@ -5,13 +5,35 @@ import (
 	"net/http"
 
 	"github.com/RohanDSkaria/hospital-management-system/api"
+	_ "github.com/RohanDSkaria/hospital-management-system/docs"
 	"github.com/RohanDSkaria/hospital-management-system/internal/database"
 	"github.com/RohanDSkaria/hospital-management-system/internal/model"
 	"github.com/RohanDSkaria/hospital-management-system/internal/repository"
 	"github.com/RohanDSkaria/hospital-management-system/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title           Hospital Management System API
+// @version         1.0
+// @description     This is the API for a simple hospital management system.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 
@@ -36,6 +58,8 @@ func main() {
 	// --- Router ---
 	router := gin.Default()
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// Public routes group
 	v1Public := router.Group("/api/v1")
 	{
@@ -48,6 +72,15 @@ func main() {
 	v1Protected.Use(api.AuthMiddleware())
 	{
 		// This is a sample protected route for testing
+		// @Summary      Get user profile
+		// @Description  Returns the current user's profile information from the JWT token.
+		// @Tags         Profile
+		// @Accept       json
+		// @Produce      json
+		// @Success      200  {object}  map[string]interface{}
+		// @Failure      401  {object}  map[string]interface{}
+		// @Security     BearerAuth
+		// @Router       /profile [get]
 		v1Protected.GET("/profile", func(c *gin.Context) {
 			userID, _ := c.Get("userID")
 			userRole, _ := c.Get("userRole")
@@ -80,6 +113,13 @@ func main() {
 		}
 	}
 
+	// @Summary      Health check
+	// @Description  Simple health check endpoint to verify the server is running.
+	// @Tags         Health
+	// @Accept       json
+	// @Produce      json
+	// @Success      200  {object}  map[string]interface{}
+	// @Router       /ping [get]
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",

@@ -1,0 +1,519 @@
+basePath: /api/v1
+definitions:
+  api.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  api.PatientRequest:
+    properties:
+      address:
+        type: string
+      contact_number:
+        type: string
+      date_of_birth:
+        type: string
+      full_name:
+        type: string
+      medical_history:
+        type: string
+    required:
+    - date_of_birth
+    - full_name
+    type: object
+  api.RegisterRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        $ref: '#/definitions/model.Role'
+    required:
+    - email
+    - full_name
+    - password
+    - role
+    type: object
+  model.Role:
+    enum:
+    - receptionist
+    - doctor
+    type: string
+    x-enum-varnames:
+    - Receptionist
+    - Doctor
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API for a simple hospital management system.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Hospital Management System API
+  version: "1.0"
+paths:
+  /doctor/patients:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all patients in the system. Accessible by both
+        receptionists and doctors.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all patients
+      tags:
+      - Patients
+  /doctor/patients/{patient_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific patient by their unique ID. Accessible by
+        both receptionists and doctors.
+      parameters:
+      - description: Patient ID
+        format: uuid
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get patient by ID
+      tags:
+      - Patients
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing patient's information. Accessible by both receptionists
+        and doctors.
+      parameters:
+      - description: Patient ID
+        format: uuid
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      - description: Updated Patient Information
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/api.PatientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update patient
+      tags:
+      - Patients
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token for access to protected
+        endpoints.
+      parameters:
+      - description: User Login Info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/api.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login user
+      tags:
+      - Authentication
+  /receptionist/patients:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all patients in the system. Accessible by both
+        receptionists and doctors.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all patients
+      tags:
+      - Patients
+    post:
+      consumes:
+      - application/json
+      description: Creates a new patient record in the system. Only accessible by
+        receptionists.
+      parameters:
+      - description: Patient Information
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/api.PatientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new patient
+      tags:
+      - Patients
+  /receptionist/patients/{patient_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a patient from the system. Only accessible by receptionists.
+      parameters:
+      - description: Patient ID
+        format: uuid
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete patient
+      tags:
+      - Patients
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific patient by their unique ID. Accessible by
+        both receptionists and doctors.
+      parameters:
+      - description: Patient ID
+        format: uuid
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get patient by ID
+      tags:
+      - Patients
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing patient's information. Accessible by both receptionists
+        and doctors.
+      parameters:
+      - description: Patient ID
+        format: uuid
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      - description: Updated Patient Information
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/api.PatientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update patient
+      tags:
+      - Patients
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account (receptionist or doctor).
+      parameters:
+      - description: User Registration Info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/api.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - Authentication
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

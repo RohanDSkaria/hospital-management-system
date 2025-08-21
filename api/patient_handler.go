@@ -26,6 +26,19 @@ type PatientRequest struct {
 	MedicalHistory string    `json:"medical_history"`
 }
 
+// @Summary      Create a new patient
+// @Description  Creates a new patient record in the system. Only accessible by receptionists.
+// @Tags         Patients
+// @Accept       json
+// @Produce      json
+// @Param        patient body PatientRequest true "Patient Information"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Security     BearerAuth
+// @Router       /receptionist/patients [post]
 // CreatePatient handles POST requests to create a patient
 func (h *PatientHandler) CreatePatient(c *gin.Context) {
 	var req PatientRequest
@@ -46,6 +59,18 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) {
 	c.JSON(http.StatusCreated, patient)
 }
 
+// @Summary      Get all patients
+// @Description  Retrieves a list of all patients in the system. Accessible by both receptionists and doctors.
+// @Tags         Patients
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Security     BearerAuth
+// @Router       /receptionist/patients [get]
+// @Router       /doctor/patients [get]
 // GetAllPatients handles GET requests to fetch all patients
 func (h *PatientHandler) GetAllPatients(c *gin.Context) {
 	patients, err := h.patientService.GetAllPatients()
@@ -56,6 +81,21 @@ func (h *PatientHandler) GetAllPatients(c *gin.Context) {
 	c.JSON(http.StatusOK, patients)
 }
 
+// @Summary      Get patient by ID
+// @Description  Retrieves a specific patient by their unique ID. Accessible by both receptionists and doctors.
+// @Tags         Patients
+// @Accept       json
+// @Produce      json
+// @Param        patient_id path string true "Patient ID" format(uuid)
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Security     BearerAuth
+// @Router       /receptionist/patients/{patient_id} [get]
+// @Router       /doctor/patients/{patient_id} [get]
 // GetPatientByID handles GET requests for a single patient
 func (h *PatientHandler) GetPatientByID(c *gin.Context) {
 	patientID, err := uuid.Parse(c.Param("patient_id"))
@@ -75,6 +115,22 @@ func (h *PatientHandler) GetPatientByID(c *gin.Context) {
 	c.JSON(http.StatusOK, patient)
 }
 
+// @Summary      Update patient
+// @Description  Updates an existing patient's information. Accessible by both receptionists and doctors.
+// @Tags         Patients
+// @Accept       json
+// @Produce      json
+// @Param        patient_id path string true "Patient ID" format(uuid)
+// @Param        patient body PatientRequest true "Updated Patient Information"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Security     BearerAuth
+// @Router       /receptionist/patients/{patient_id} [put]
+// @Router       /doctor/patients/{patient_id} [put]
 // UpdatePatient handles PUT requests to update a patient
 func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 	patientID, err := uuid.Parse(c.Param("patient_id"))
@@ -99,6 +155,19 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 	c.JSON(http.StatusOK, patient)
 }
 
+// @Summary      Delete patient
+// @Description  Deletes a patient from the system. Only accessible by receptionists.
+// @Tags         Patients
+// @Accept       json
+// @Produce      json
+// @Param        patient_id path string true "Patient ID" format(uuid)
+// @Success      204  {string}  string "No Content"
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Security     BearerAuth
+// @Router       /receptionist/patients/{patient_id} [delete]
 // DeletePatient handles DELETE requests to remove a patient
 func (h *PatientHandler) DeletePatient(c *gin.Context) {
 	patientID, err := uuid.Parse(c.Param("patient_id"))
